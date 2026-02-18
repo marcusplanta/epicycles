@@ -148,6 +148,7 @@
   .main {
     display: flex;
     flex: 1;
+    min-height: 0;
     overflow: hidden;
     position: relative;
   }
@@ -251,16 +252,20 @@
     display: none;
     background: var(--panel);
     border-top: 1px solid var(--border);
-    padding: 8px 12px;
-    gap: 6px;
+    padding: 6px 10px;
+    gap: 5px;
     flex-shrink: 0;
+    flex-direction: column;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
   }
   .bottom-bar-row {
     display: flex;
-    gap: 6px;
+    gap: 5px;
     align-items: center;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    flex-shrink: 0;
   }
   .bottom-bar .shape-btn {
     width: auto;
@@ -362,16 +367,24 @@
   @media (max-width: 680px) {
     .sidebar { display: none; }
     .bottom-bar { display: flex; flex-direction: column; }
-    input[type=range] { width: 90px; }
-    .toolbar { gap: 8px; }
+    input[type=range] { width: 80px; }
+    .toolbar { gap: 6px; padding: 5px 10px; }
     #hint { font-size: 0.55rem; }
   }
 
   @media (max-width: 480px) {
     .logo { font-size: 1.1rem; }
-    .btn { font-size: 0.58rem; padding: 6px 9px; }
-    input[type=range] { width: 70px; }
-    .num-input { width: 38px; }
+    .btn { font-size: 0.58rem; padding: 5px 8px; }
+    input[type=range] { width: 60px; }
+    .num-input { width: 36px; font-size: 0.62rem; }
+    .slider-group { font-size: 0.55rem; gap: 5px; }
+    header { padding: 6px 10px; min-height: 40px; }
+    .toolbar { padding: 4px 10px; gap: 5px; }
+    .bottom-bar { padding: 5px 8px; gap: 4px; }
+    .bottom-bar-row { gap: 5px; }
+    .bottom-bar .shape-btn { padding: 6px 10px; font-size: 0.58rem; }
+    .bottom-bar .toggle-label { font-size: 0.58rem; padding: 4px 7px; }
+    .toolbar-divider { display: none; }
   }
 </style>
 </head>
@@ -497,11 +510,22 @@ function resize() {
   W = canvas.width  = canvas.offsetWidth;
   H = canvas.height = canvas.offsetHeight;
 }
-window.addEventListener('resize', () => { resize(); if (fourier.length) restart(); });
+window.addEventListener('resize', () => {
+  resize();
+  if (fourier.length) {
+    // Rescale originalPts to new canvas size if playing a preset
+    if (currentPreset) {
+      loadPreset(currentPreset);
+    } else {
+      restart();
+    }
+  }
+});
 resize();
 
 // ── State ──────────────────────────────────────────────────────────────────────
 let mode        = 'idle';
+let currentPreset = null; // track active preset for resize rescaling
 let isMouseDown = false;
 let sketchPoints = [];
 let originalPts  = [];
@@ -750,6 +774,7 @@ function drawGrid() {
 
 // ── Draw mode ──────────────────────────────────────────────────────────────────
 function enterDrawMode() {
+  currentPreset = null;
   stopAnim(); sketchPoints = [];
   mode = 'drawing';
   ctx.clearRect(0,0,W,H); drawGrid();
@@ -870,6 +895,7 @@ canvas.addEventListener('touchend', e => {
 
 // ── Presets ────────────────────────────────────────────────────────────────────
 function loadPreset(name) {
+  currentPreset = name;
   const N = 512;
   const R = Math.min(W, H) * 0.33;
   const pts = [];
@@ -915,9 +941,10 @@ function loadPreset(name) {
 // ── Boot ───────────────────────────────────────────────────────────────────────
 drawGrid();
 setTimeout(() => {
+  resize(); // ensure canvas is sized before computing preset radius
   document.querySelectorAll('[data-shape="heart"]').forEach(b => b.classList.add('active'));
   loadPreset('heart');
-}, 150);
+}, 200);
 </script>
 </body>
 </html>
