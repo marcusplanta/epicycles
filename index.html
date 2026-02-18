@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Epicycles — Fourier Drawing Machine</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Bebas+Neue&display=swap');
@@ -25,27 +25,29 @@
     background: var(--bg);
     color: var(--text);
     font-family: 'Space Mono', monospace;
-    height: 100vh;
+    height: 100dvh;
     display: flex;
     flex-direction: column;
     overflow: hidden;
   }
 
+  /* ── Header ── */
   header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 10px 20px;
+    padding: 8px 14px;
     border-bottom: 1px solid var(--border);
     background: var(--surface);
     flex-shrink: 0;
-    gap: 12px;
+    gap: 8px;
     flex-wrap: wrap;
+    min-height: 48px;
   }
 
   .logo {
     font-family: 'Bebas Neue', sans-serif;
-    font-size: 1.5rem;
+    font-size: 1.4rem;
     letter-spacing: 0.15em;
     color: var(--accent);
     text-shadow: 0 0 18px rgba(0,229,255,0.45);
@@ -53,19 +55,20 @@
   }
   .logo span { color: var(--accent2); }
 
-  .controls {
+  .header-right {
     display: flex;
     align-items: center;
-    gap: 12px;
-    flex-wrap: wrap;
+    gap: 6px;
+    flex-shrink: 0;
   }
 
+  /* ── Buttons ── */
   .btn {
     font-family: 'Space Mono', monospace;
-    font-size: 0.65rem;
-    letter-spacing: 0.08em;
+    font-size: 0.62rem;
+    letter-spacing: 0.07em;
     text-transform: uppercase;
-    padding: 6px 13px;
+    padding: 6px 11px;
     border: 1px solid var(--border);
     background: transparent;
     color: var(--text);
@@ -73,115 +76,59 @@
     transition: all 0.15s;
     border-radius: 2px;
     white-space: nowrap;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
   }
-  .btn:hover { border-color: var(--accent); color: var(--accent); background: rgba(0,229,255,0.05); }
+  .btn:hover  { border-color: var(--accent);  color: var(--accent);  background: rgba(0,229,255,0.05); }
   .btn.active { border-color: var(--accent2); color: var(--accent2); background: rgba(255,45,120,0.08); }
-  .btn.primary { border-color: var(--accent); color: var(--accent); background: rgba(0,229,255,0.07); }
+  .btn.primary{ border-color: var(--accent);  color: var(--accent);  background: rgba(0,229,255,0.07); }
+  .btn.info   { border-color: var(--muted);   color: var(--muted); }
+  .btn.info:hover { border-color: var(--accent3); color: var(--accent3); }
+
+  /* ── Toolbar (sliders + action buttons) ── */
+  .toolbar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 14px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+    flex-shrink: 0;
+    flex-wrap: wrap;
+  }
 
   .slider-group {
     display: flex;
     align-items: center;
-    gap: 7px;
-    font-size: 0.62rem;
+    gap: 6px;
+    font-size: 0.6rem;
     letter-spacing: 0.06em;
     text-transform: uppercase;
     color: var(--muted);
   }
   input[type=range] {
     -webkit-appearance: none;
-    width: 80px; height: 2px;
+    width: 70px; height: 2px;
     background: var(--border);
     outline: none; border-radius: 2px;
+    flex-shrink: 0;
   }
   input[type=range]::-webkit-slider-thumb {
     -webkit-appearance: none;
-    width: 11px; height: 11px;
+    width: 14px; height: 14px;
     border-radius: 50%;
     background: var(--accent);
     cursor: pointer;
     box-shadow: 0 0 7px rgba(0,229,255,0.6);
   }
-  .val-display { color: var(--accent); font-size: 0.72rem; min-width: 26px; text-align: right; }
-
-  .main { display: flex; flex: 1; overflow: hidden; position: relative; }
-  canvas { flex: 1; display: block; cursor: crosshair; }
-
-  .sidebar {
-    width: 190px;
-    background: var(--panel);
-    border-left: 1px solid var(--border);
-    display: flex;
-    flex-direction: column;
-    padding: 14px;
-    gap: 10px;
-    flex-shrink: 0;
-    overflow-y: auto;
-  }
-
-  .sidebar-title {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 0.9rem;
-    letter-spacing: 0.15em;
-    color: var(--muted);
-    border-bottom: 1px solid var(--border);
-    padding-bottom: 6px;
-  }
-
-  .shape-btn {
-    font-family: 'Space Mono', monospace;
-    font-size: 0.62rem;
-    letter-spacing: 0.07em;
-    text-transform: uppercase;
-    padding: 7px 10px;
-    border: 1px solid var(--border);
-    background: transparent;
-    color: var(--text);
-    cursor: pointer;
-    transition: all 0.15s;
-    text-align: left;
-    border-radius: 2px;
-    width: 100%;
-  }
-  .shape-btn:hover { border-color: var(--accent3); color: var(--accent3); background: rgba(255,229,102,0.05); }
-  .shape-btn.active { border-color: var(--accent3); color: var(--accent3); }
-
-  .toggle-label {
-    font-size: 0.62rem; color: var(--muted); letter-spacing: 0.06em;
-    cursor: pointer; display: flex; align-items: center; gap: 8px;
-  }
-  input[type=checkbox] { accent-color: var(--accent); }
-
-  .status {
-    margin-top: auto;
-    font-size: 0.58rem;
-    color: var(--muted);
-    letter-spacing: 0.05em;
-    line-height: 2;
-  }
-  .status .val { color: var(--text); }
-
-  #hint {
-    position: absolute;
-    bottom: 18px;
-    left: 50%;
-    transform: translateX(-50%);
-    font-size: 0.6rem;
-    color: var(--muted);
-    letter-spacing: 0.08em;
-    text-align: center;
-    pointer-events: none;
-    transition: opacity 0.4s;
-    white-space: nowrap;
-  }
-
   .num-input {
     font-family: 'Space Mono', monospace;
-    font-size: 0.7rem;
-    width: 44px;
+    font-size: 0.68rem;
+    width: 42px;
     background: var(--bg);
     border: 1px solid var(--border);
     color: var(--accent);
-    padding: 2px 5px;
+    padding: 3px 5px;
     border-radius: 2px;
     text-align: center;
     outline: none;
@@ -191,44 +138,315 @@
   .num-input::-webkit-outer-spin-button { -webkit-appearance: none; }
   .num-input:focus { border-color: var(--accent); }
 
-  #modeTag {
+  .toolbar-divider {
+    width: 1px; height: 20px;
+    background: var(--border);
+    flex-shrink: 0;
+  }
+
+  /* ── Main layout ── */
+  .main {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+    position: relative;
+  }
+
+  canvas {
+    flex: 1;
+    display: block;
+    cursor: crosshair;
+    touch-action: none;
+  }
+
+  /* ── Sidebar (desktop) ── */
+  .sidebar {
+    width: 175px;
+    background: var(--panel);
+    border-left: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    padding: 12px;
+    gap: 8px;
+    flex-shrink: 0;
+    overflow-y: auto;
+  }
+
+  .sidebar-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 0.85rem;
+    letter-spacing: 0.15em;
+    color: var(--muted);
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 5px;
+  }
+
+  .shape-btn {
+    font-family: 'Space Mono', monospace;
     font-size: 0.6rem;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    padding: 7px 9px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text);
+    cursor: pointer;
+    transition: all 0.15s;
+    text-align: left;
+    border-radius: 2px;
+    width: 100%;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .shape-btn:hover  { border-color: var(--accent3); color: var(--accent3); background: rgba(255,229,102,0.05); }
+  .shape-btn.active { border-color: var(--accent3); color: var(--accent3); }
+
+  .toggle-label {
+    font-size: 0.6rem; color: var(--muted); letter-spacing: 0.05em;
+    cursor: pointer; display: flex; align-items: center; gap: 7px;
+    touch-action: manipulation;
+  }
+  input[type=checkbox] { accent-color: var(--accent); width: 14px; height: 14px; }
+
+  .status {
+    margin-top: auto;
+    font-size: 0.56rem;
+    color: var(--muted);
+    letter-spacing: 0.04em;
+    line-height: 2;
+  }
+  .status .val { color: var(--text); }
+
+  /* ── Hint overlay ── */
+  #hint {
+    position: absolute;
+    bottom: 14px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.58rem;
+    color: var(--muted);
+    letter-spacing: 0.07em;
+    text-align: center;
+    pointer-events: none;
+    transition: opacity 0.4s;
+    white-space: nowrap;
+    background: rgba(7,8,12,0.7);
+    padding: 4px 10px;
+    border-radius: 2px;
+  }
+
+  #modeTag {
+    font-size: 0.58rem;
     color: var(--muted);
     letter-spacing: 0.1em;
     text-transform: uppercase;
-    padding: 4px 8px;
+    padding: 4px 7px;
     border: 1px solid var(--border);
     border-radius: 2px;
     flex-shrink: 0;
+  }
+
+  /* ── Mobile bottom sheet for presets/toggles ── */
+  .bottom-bar {
+    display: none;
+    background: var(--panel);
+    border-top: 1px solid var(--border);
+    padding: 8px 12px;
+    gap: 6px;
+    flex-shrink: 0;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .bottom-bar-row {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+  }
+  .bottom-bar .shape-btn {
+    width: auto;
+    white-space: nowrap;
+    padding: 7px 12px;
+    font-size: 0.62rem;
+  }
+  .bottom-bar .toggle-label {
+    white-space: nowrap;
+    font-size: 0.62rem;
+    padding: 4px 8px;
+    border: 1px solid var(--border);
+    border-radius: 2px;
+  }
+
+  /* ── Info Modal ── */
+  #modalOverlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.78);
+    z-index: 200;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+  }
+  #modalOverlay.open { display: flex; }
+
+  #modal {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    max-width: 540px;
+    width: 100%;
+    max-height: 85dvh;
+    overflow-y: auto;
+    padding: 24px 26px 28px;
+    position: relative;
+    box-shadow: 0 0 60px rgba(0,0,0,0.7);
+  }
+
+  #modal h2 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.3rem;
+    letter-spacing: 0.15em;
+    color: var(--accent);
+    text-shadow: 0 0 14px rgba(0,229,255,0.3);
+    margin-bottom: 14px;
+    padding-right: 60px;
+  }
+  #modal h3 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 0.9rem;
+    letter-spacing: 0.12em;
+    color: var(--accent3);
+    margin: 16px 0 7px;
+  }
+  #modal p {
+    font-size: 0.66rem;
+    line-height: 1.9;
+    color: var(--text);
+    letter-spacing: 0.03em;
+  }
+  #modal ul {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+  #modal li {
+    font-size: 0.66rem;
+    line-height: 1.75;
+    color: var(--text);
+    letter-spacing: 0.03em;
+  }
+  #modal li::before { content: '▸ '; color: var(--accent2); }
+  #modal .tag { color: var(--accent); font-weight: 700; }
+
+  #modalClose {
+    position: absolute;
+    top: 14px; right: 14px;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 5px 10px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+    border-radius: 2px;
+    transition: all 0.15s;
+    touch-action: manipulation;
+  }
+  #modalClose:hover { border-color: var(--accent2); color: var(--accent2); }
+
+  /* ── Responsive breakpoints ── */
+  @media (max-width: 680px) {
+    .sidebar { display: none; }
+    .bottom-bar { display: flex; flex-direction: column; }
+    input[type=range] { width: 90px; }
+    .toolbar { gap: 8px; }
+    #hint { font-size: 0.55rem; }
+  }
+
+  @media (max-width: 480px) {
+    .logo { font-size: 1.1rem; }
+    .btn { font-size: 0.58rem; padding: 6px 9px; }
+    input[type=range] { width: 70px; }
+    .num-input { width: 38px; }
   }
 </style>
 </head>
 <body>
 
+<!-- ── Info Modal (placed first so it's in DOM before scripts run) ── -->
+<div id="modalOverlay">
+  <div id="modal">
+    <button id="modalClose">✕ Close</button>
+    <h2>Epicycles — Fourier Drawing Machine</h2>
+    <p>An interactive visualization showing how any closed shape can be approximated using a chain of rotating circles (epicycles), powered by the <span class="tag">Discrete Fourier Transform (DFT)</span>.</p>
+
+    <h3>How It Works</h3>
+    <p>You provide a shape — either by picking a preset or drawing freehand — and the tool runs a DFT on it, decomposing the path into frequency components. Each component becomes a spinning circle. The circles are chained tip-to-tail, each rotating at its own speed and radius, and the path traced by the final tip reconstructs the original shape.</p>
+
+    <h3>Controls</h3>
+    <ul>
+      <li><span class="tag">Presets</span> — Heart, Circle, Star, Lissajous, Trefoil, Butterfly</li>
+      <li><span class="tag">✏ Draw</span> — sketch any shape freehand with your finger or mouse, then hit Play</li>
+      <li><span class="tag">▶ Play</span> — start or restart the animation</li>
+      <li><span class="tag">⏸ Pause</span> — freeze the animation at any point</li>
+      <li><span class="tag">✕ Clear</span> — reset everything</li>
+      <li><span class="tag">Circles</span> — how many epicycles to use; fewer = rougher approximation, more = closer to the original</li>
+      <li><span class="tag">Speed</span> — how fast the dot travels around the path (range 2–20)</li>
+    </ul>
+
+    <h3>Display Toggles</h3>
+    <ul>
+      <li><span class="tag">Circles</span> — show/hide the spinning circle outlines</li>
+      <li><span class="tag">Arms</span> — show/hide the lines connecting each circle to the next</li>
+      <li><span class="tag">Trace</span> — show/hide the pink path being drawn by the tip</li>
+    </ul>
+
+    <h3>What to Observe</h3>
+    <ul>
+      <li>The <span class="tag">dashed yellow outline</span> is the original input shape for comparison</li>
+      <li>The <span class="tag">pink trace</span> is what the epicycles actually draw — at low circle counts it's a rough approximation, at high counts it closely matches the original</li>
+      <li>Each circle represents one <span class="tag">frequency component</span> — a visual intuition for how Fourier analysis decomposes any complex periodic signal into simple sine waves</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ── Header ── -->
 <header>
   <div class="logo">EPIC<span>YCLES</span></div>
-  <div class="controls">
-    <div class="slider-group">
-      <span>Circles</span>
-      <input type="range" id="numCircles" min="1" max="200" value="60">
-      <input type="number" class="num-input" id="numCirclesInput" min="1" max="200" value="60">
-    </div>
-    <div class="slider-group">
-      <span>Speed</span>
-      <input type="range" id="speedSlider" min="2" max="20" value="4">
-      <input type="number" class="num-input" id="speedInput" min="2" max="20" value="4">
-    </div>
-    <button class="btn" id="drawBtn">✏ Draw</button>
-    <button class="btn primary" id="playBtn">▶ Play</button>
-    <button class="btn" id="pauseBtn">⏸ Pause</button>
-    <button class="btn" id="clearBtn">✕ Clear</button>
+  <div class="header-right">
+    <div id="modeTag">PRESET</div>
+    <button class="btn info" id="infoBtn">? Info</button>
   </div>
-  <div id="modeTag">PRESET</div>
 </header>
 
+<!-- ── Toolbar ── -->
+<div class="toolbar">
+  <div class="slider-group">
+    <span>Circles</span>
+    <input type="range" id="numCircles" min="1" max="200" value="60">
+    <input type="number" class="num-input" id="numCirclesInput" min="1" max="200" value="60">
+  </div>
+  <div class="slider-group">
+    <span>Speed</span>
+    <input type="range" id="speedSlider" min="2" max="20" value="4">
+    <input type="number" class="num-input" id="speedInput" min="2" max="20" value="4">
+  </div>
+  <div class="toolbar-divider"></div>
+  <button class="btn" id="drawBtn">✏ Draw</button>
+  <button class="btn primary" id="playBtn">▶ Play</button>
+  <button class="btn" id="pauseBtn">⏸ Pause</button>
+  <button class="btn" id="clearBtn">✕ Clear</button>
+</div>
+
+<!-- ── Main ── -->
 <div class="main">
   <canvas id="canvas"></canvas>
 
+  <!-- Desktop sidebar -->
   <div class="sidebar">
     <div class="sidebar-title">Presets</div>
     <button class="shape-btn" data-shape="heart">♥  Heart</button>
@@ -238,7 +456,7 @@
     <button class="shape-btn" data-shape="trefoil">✦  Trefoil</button>
     <button class="shape-btn" data-shape="butterfly">⌘  Butterfly</button>
 
-    <div class="sidebar-title" style="margin-top:6px">Display</div>
+    <div class="sidebar-title" style="margin-top:4px">Display</div>
     <label class="toggle-label"><input type="checkbox" id="showCircles" checked> Circles</label>
     <label class="toggle-label"><input type="checkbox" id="showArms" checked> Arms</label>
     <label class="toggle-label"><input type="checkbox" id="showTrace" checked> Trace</label>
@@ -250,7 +468,24 @@
     </div>
   </div>
 
-  <div id="hint">Pick a preset or click ✏ Draw to sketch your own shape</div>
+  <div id="hint">Pick a preset or tap ✏ Draw to sketch</div>
+</div>
+
+<!-- ── Mobile bottom bar ── -->
+<div class="bottom-bar">
+  <div class="bottom-bar-row">
+    <button class="shape-btn" data-shape="heart">♥ Heart</button>
+    <button class="shape-btn" data-shape="circle">◯ Circle</button>
+    <button class="shape-btn" data-shape="star">★ Star</button>
+    <button class="shape-btn" data-shape="lissajous">≋ Lissajous</button>
+    <button class="shape-btn" data-shape="trefoil">✦ Trefoil</button>
+    <button class="shape-btn" data-shape="butterfly">⌘ Butterfly</button>
+  </div>
+  <div class="bottom-bar-row">
+    <label class="toggle-label"><input type="checkbox" id="showCirclesMobile" checked> Circles</label>
+    <label class="toggle-label"><input type="checkbox" id="showArmsMobile" checked> Arms</label>
+    <label class="toggle-label"><input type="checkbox" id="showTraceMobile" checked> Trace</label>
+  </div>
 </div>
 
 <script>
@@ -259,41 +494,69 @@ const ctx = canvas.getContext('2d');
 
 let W, H;
 function resize() {
-  W = canvas.width = canvas.offsetWidth;
+  W = canvas.width  = canvas.offsetWidth;
   H = canvas.height = canvas.offsetHeight;
 }
 window.addEventListener('resize', () => { resize(); if (fourier.length) restart(); });
 resize();
 
 // ── State ──────────────────────────────────────────────────────────────────────
-let mode = 'idle';
+let mode        = 'idle';
 let isMouseDown = false;
 let sketchPoints = [];
-let originalPts = [];   // centered input points for ghost drawing
-let fourier = [];       // sorted DFT bins
-let dftN = 0;           // number of input points used for DFT
-let time = 0;           // sweeps 0 → dftN (one full cycle = dftN steps)
-let tracePoints = [];    // live-accumulated trace, cleared each cycle
-let animId = null;
-let paused = false;
-let numCircles = 60;
-let animSpeed = 4;
-let showCircles = true;
-let showArms    = true;
-let showTrace   = true;
+let originalPts  = [];
+let fourier      = [];
+let dftN         = 0;
+let time         = 0;
+let tracePoints  = [];
+let animId       = null;
+let paused       = false;
+let numCircles   = 60;
+let animSpeed    = 4;
+let showCircles  = true;
+let showArms     = true;
+let showTrace    = true;
 
-// ── Controls ───────────────────────────────────────────────────────────────────
+// ── Slider + number input sync helpers ────────────────────────────────────────
+function syncCircles(v) {
+  v = Math.min(200, Math.max(1, v));
+  numCircles = v;
+  document.getElementById('numCircles').value = v;
+  document.getElementById('numCirclesInput').value = v;
+}
+function syncSpeed(v) {
+  v = Math.min(20, Math.max(2, v));
+  animSpeed = v;
+  document.getElementById('speedSlider').value = v;
+  document.getElementById('speedInput').value = v;
+  time = 0; tracePoints = [];
+}
+
 document.getElementById('numCircles').addEventListener('input', e => {
-  numCircles = +e.target.value;
+  syncCircles(+e.target.value);
   if (fourier.length) restart();
 });
-document.getElementById('speedSlider').addEventListener('input', e => {
-  animSpeed = +e.target.value;
-  time = 0; tracePoints = [];
+document.getElementById('numCirclesInput').addEventListener('change', e => {
+  syncCircles(+e.target.value);
+  if (fourier.length) restart();
 });
-document.getElementById('showCircles').addEventListener('change', e => showCircles = e.target.checked);
-document.getElementById('showArms').addEventListener('change',    e => showArms    = e.target.checked);
-document.getElementById('showTrace').addEventListener('change',   e => showTrace   = e.target.checked);
+document.getElementById('speedSlider').addEventListener('input', e => syncSpeed(+e.target.value));
+document.getElementById('speedInput').addEventListener('change',  e => syncSpeed(+e.target.value));
+
+// Display toggles — keep desktop + mobile in sync
+function syncToggles() {
+  document.getElementById('showCirclesMobile').checked = showCircles;
+  document.getElementById('showArmsMobile').checked    = showArms;
+  document.getElementById('showTraceMobile').checked   = showTrace;
+}
+document.getElementById('showCircles').addEventListener('change', e => { showCircles = e.target.checked; syncToggles(); });
+document.getElementById('showArms').addEventListener('change',    e => { showArms    = e.target.checked; syncToggles(); });
+document.getElementById('showTrace').addEventListener('change',   e => { showTrace   = e.target.checked; syncToggles(); });
+document.getElementById('showCirclesMobile').addEventListener('change', e => { showCircles = e.target.checked; document.getElementById('showCircles').checked = showCircles; });
+document.getElementById('showArmsMobile').addEventListener('change',    e => { showArms    = e.target.checked; document.getElementById('showArms').checked    = showArms;    });
+document.getElementById('showTraceMobile').addEventListener('change',   e => { showTrace   = e.target.checked; document.getElementById('showTrace').checked   = showTrace;   });
+
+// Action buttons
 document.getElementById('drawBtn').addEventListener('click', enterDrawMode);
 document.getElementById('playBtn').addEventListener('click', () => {
   if (mode === 'drawing' && sketchPoints.length > 10) {
@@ -302,64 +565,43 @@ document.getElementById('playBtn').addEventListener('click', () => {
     restart();
   }
 });
-document.getElementById('clearBtn').addEventListener('click', fullReset);
-
-// Number inputs stay in sync with sliders
-document.getElementById('numCirclesInput').addEventListener('change', e => {
-  const v = Math.min(200, Math.max(1, +e.target.value || 1));
-  e.target.value = v;
-  numCircles = v;
-  document.getElementById('numCircles').value = v;
-  if (fourier.length) restart();
-});
-document.getElementById('speedInput').addEventListener('change', e => {
-  const v = Math.min(20, Math.max(2, +e.target.value || 2));
-  e.target.value = v;
-  animSpeed = v;
-  time = 0; tracePoints = [];
-  document.getElementById('speedSlider').value = v;
-});
-
-// Keep sliders synced to number inputs
-document.getElementById('numCircles').addEventListener('input', e => {
-  document.getElementById('numCirclesInput').value = e.target.value;
-});
-document.getElementById('speedSlider').addEventListener('input', e => {
-  document.getElementById('speedInput').value = e.target.value;
-});
-
-// Pause / resume
 document.getElementById('pauseBtn').addEventListener('click', () => {
   if (!fourier.length) return;
   paused = !paused;
   const btn = document.getElementById('pauseBtn');
-  if (paused) {
-    btn.textContent = '▶ Resume';
-    btn.classList.add('active');
-  } else {
-    btn.textContent = '⏸ Pause';
-    btn.classList.remove('active');
-  }
+  btn.textContent = paused ? '▶ Resume' : '⏸ Pause';
+  paused ? btn.classList.add('active') : btn.classList.remove('active');
 });
+document.getElementById('clearBtn').addEventListener('click', fullReset);
+
+// All shape buttons (desktop sidebar + mobile bar)
 document.querySelectorAll('.shape-btn').forEach(b =>
   b.addEventListener('click', () => {
     document.querySelectorAll('.shape-btn').forEach(x => x.classList.remove('active'));
-    b.classList.add('active');
+    // activate matching buttons in both sidebar and mobile bar
+    document.querySelectorAll(`.shape-btn[data-shape="${b.dataset.shape}"]`).forEach(x => x.classList.add('active'));
     loadPreset(b.dataset.shape);
   })
 );
 
-// ── DFT ────────────────────────────────────────────────────────────────────────
-// Treat the 2D path as complex numbers: z_n = x_n + i·y_n
-// X_k = (1/N) Σ_{n=0}^{N-1}  z_n · e^{−2πi·k·n/N}
-//
-// Reconstruction at continuous parameter t (0 ≤ t < N):
-//   z(t) = Σ_k  X_k · e^{2πi·k·t/N}
-//        = Σ_k  amp_k · e^{i·(2π·freq_k·t/N + phase_k)}
-//
-// So each circle rotates at angular speed  ω_k = 2π·freq_k / N  per unit of t.
-// When t advances by N it completes exactly one full cycle.
+// Info modal
+document.getElementById('infoBtn').addEventListener('click', () =>
+  document.getElementById('modalOverlay').classList.add('open')
+);
+document.getElementById('modalClose').addEventListener('click', () =>
+  document.getElementById('modalOverlay').classList.remove('open')
+);
+document.getElementById('modalOverlay').addEventListener('click', e => {
+  if (e.target === document.getElementById('modalOverlay'))
+    document.getElementById('modalOverlay').classList.remove('open');
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') document.getElementById('modalOverlay').classList.remove('open');
+});
 
+// ── DFT ────────────────────────────────────────────────────────────────────────
+// z_n = x_n + i·y_n  →  X_k = (1/N) Σ z_n · e^{−2πi·k·n/N}
+// Reconstruction: z(t) = Σ X_k · e^{2πi·k·t/N}
 function dft(pts) {
   const N = pts.length;
   const out = [];
@@ -368,16 +610,11 @@ function dft(pts) {
     for (let n = 0; n < N; n++) {
       const angle = (2 * Math.PI * k * n) / N;
       const c = Math.cos(angle), s = Math.sin(angle);
-      // z_n · e^{−iθ} = (x + iy)(c − is) = xc+ys  +  i(yc−xs)
       re += pts[n].x * c + pts[n].y * s;
       im += pts[n].y * c - pts[n].x * s;
     }
     re /= N; im /= N;
-    out.push({
-      freq:  k,
-      amp:   Math.sqrt(re * re + im * im),
-      phase: Math.atan2(im, re)
-    });
+    out.push({ freq: k, amp: Math.sqrt(re*re + im*im), phase: Math.atan2(im, re) });
   }
   out.sort((a, b) => b.amp - a.amp);
   return out;
@@ -386,24 +623,19 @@ function dft(pts) {
 // ── Helpers ────────────────────────────────────────────────────────────────────
 function resample(pts, N) {
   if (pts.length < 2) return pts;
-  // build cumulative arc-length table
   const lens = [0];
   for (let i = 1; i < pts.length; i++) {
     const dx = pts[i].x - pts[i-1].x, dy = pts[i].y - pts[i-1].y;
     lens.push(lens[i-1] + Math.sqrt(dx*dx + dy*dy));
   }
-  const total = lens[lens.length - 1];
-  const out = [];
-  let j = 0;
+  const total = lens[lens.length-1];
+  const out = []; let j = 0;
   for (let i = 0; i < N; i++) {
     const target = (i / N) * total;
-    while (j < lens.length - 2 && lens[j+1] < target) j++;
+    while (j < lens.length-2 && lens[j+1] < target) j++;
     const span = lens[j+1] - lens[j];
     const frac = span > 0 ? (target - lens[j]) / span : 0;
-    out.push({
-      x: pts[j].x + frac * (pts[j+1].x - pts[j].x),
-      y: pts[j].y + frac * (pts[j+1].y - pts[j].y)
-    });
+    out.push({ x: pts[j].x + frac*(pts[j+1].x-pts[j].x), y: pts[j].y + frac*(pts[j+1].y-pts[j].y) });
   }
   return out;
 }
@@ -411,11 +643,10 @@ function resample(pts, N) {
 function centerPts(pts) {
   const cx = pts.reduce((s,p) => s+p.x, 0) / pts.length;
   const cy = pts.reduce((s,p) => s+p.y, 0) / pts.length;
-  return pts.map(p => ({ x: p.x - cx, y: p.y - cy }));
+  return pts.map(p => ({ x: p.x-cx, y: p.y-cy }));
 }
 
 // ── Animation ──────────────────────────────────────────────────────────────────
-
 function restart() {
   paused = false;
   const btn = document.getElementById('pauseBtn');
@@ -430,7 +661,7 @@ function loop() {
   render();
   if (!paused) {
     time += animSpeed * 0.5;
-    if (time >= dftN) { time -= dftN; }
+    if (time >= dftN) time -= dftN;
   }
 }
 
@@ -440,84 +671,73 @@ function render() {
   if (!fourier.length) return;
 
   const N = Math.min(numCircles, fourier.length);
-
-  // Compute tip position by summing epicycle contributions
-  let x = W / 2, y = H / 2;
+  let x = W/2, y = H/2;
 
   for (let i = 0; i < N; i++) {
     const { freq, amp, phase } = fourier[i];
     if (amp < 0.3) continue;
-
     const px = x, py = y;
-    // angle this circle has rotated to at the current time
-    const angle = (2 * Math.PI * freq * time) / dftN + phase;
+    const angle = (2*Math.PI*freq*time)/dftN + phase;
     x += amp * Math.cos(angle);
     y += amp * Math.sin(angle);
 
     if (showCircles) {
-      const alpha = Math.max(0.03, 0.28 - i * 0.0013);
+      const alpha = Math.max(0.03, 0.28 - i*0.0013);
       ctx.beginPath();
-      ctx.arc(px, py, amp, 0, 2 * Math.PI);
+      ctx.arc(px, py, amp, 0, 2*Math.PI);
       ctx.strokeStyle = `rgba(0,229,255,${alpha})`;
       ctx.lineWidth = 1;
       ctx.stroke();
     }
-
     if (showArms) {
-      const alpha = Math.max(0.1, 0.72 - i * 0.009);
+      const alpha = Math.max(0.1, 0.72 - i*0.009);
       ctx.beginPath();
-      ctx.moveTo(px, py);
-      ctx.lineTo(x, y);
+      ctx.moveTo(px, py); ctx.lineTo(x, y);
       ctx.strokeStyle = `rgba(0,229,255,${alpha})`;
       ctx.lineWidth = i < 3 ? 1.5 : 0.8;
       ctx.stroke();
     }
   }
 
-  // Glowing tip dot
+  // Tip dot
   ctx.shadowBlur = 14; ctx.shadowColor = '#ffe566';
-  ctx.beginPath(); ctx.arc(x, y, 3.5, 0, 2 * Math.PI);
+  ctx.beginPath(); ctx.arc(x, y, 3.5, 0, 2*Math.PI);
   ctx.fillStyle = '#ffe566'; ctx.fill();
   ctx.shadowBlur = 0;
 
-  // Draw original input shape as a dim ghost for comparison
-  if (originalPts.length > 1) {
-    ctx.beginPath();
-    ctx.moveTo(originalPts[0].x + W/2, originalPts[0].y + H/2);
-    for (let i = 1; i < originalPts.length; i++)
-      ctx.lineTo(originalPts[i].x + W/2, originalPts[i].y + H/2);
-    ctx.closePath();
-    ctx.strokeStyle = 'rgba(255,229,102,0.22)';
-    ctx.lineWidth = 1.5;
-    ctx.lineJoin = 'round';
-    ctx.setLineDash([4, 6]);
-    ctx.stroke();
-    ctx.setLineDash([]);
-  }
-
-  // Live trace — sliding window capped to exactly one cycle
+  // Sliding trace — always exactly one cycle
   if (!paused) {
     tracePoints.push({ x, y });
-    // One cycle = dftN / (animSpeed * 0.5) frames
     const maxPts = Math.ceil(dftN / (animSpeed * 0.5));
     while (tracePoints.length > maxPts) tracePoints.shift();
   }
 
+  // Ghost: original input shape
+  if (originalPts.length > 1) {
+    ctx.beginPath();
+    ctx.moveTo(originalPts[0].x+W/2, originalPts[0].y+H/2);
+    for (let i = 1; i < originalPts.length; i++)
+      ctx.lineTo(originalPts[i].x+W/2, originalPts[i].y+H/2);
+    ctx.closePath();
+    ctx.strokeStyle = 'rgba(255,229,102,0.22)';
+    ctx.lineWidth = 1.5; ctx.lineJoin = 'round';
+    ctx.setLineDash([4,6]); ctx.stroke(); ctx.setLineDash([]);
+  }
+
+  // Trace
   if (showTrace && tracePoints.length > 1) {
     ctx.beginPath();
     ctx.moveTo(tracePoints[0].x, tracePoints[0].y);
     for (let i = 1; i < tracePoints.length; i++) ctx.lineTo(tracePoints[i].x, tracePoints[i].y);
     ctx.strokeStyle = 'rgba(255,45,120,0.88)';
-    ctx.lineWidth = 1.8;
-    ctx.lineJoin = 'round';
+    ctx.lineWidth = 1.8; ctx.lineJoin = 'round';
     ctx.shadowBlur = 5; ctx.shadowColor = '#ff2d78';
-    ctx.stroke();
-    ctx.shadowBlur = 0;
+    ctx.stroke(); ctx.shadowBlur = 0;
   }
 
-  document.getElementById('s-n').textContent = N;
-  document.getElementById('s-pts').textContent = dftN;
-  document.getElementById('s-phase').textContent = (time / dftN * 100).toFixed(1) + '%';
+  document.getElementById('s-n').textContent     = N;
+  document.getElementById('s-pts').textContent   = dftN;
+  document.getElementById('s-phase').textContent = (time/dftN*100).toFixed(1)+'%';
 }
 
 function drawGrid() {
@@ -532,8 +752,8 @@ function drawGrid() {
 function enterDrawMode() {
   stopAnim(); sketchPoints = [];
   mode = 'drawing';
-  ctx.clearRect(0, 0, W, H); drawGrid();
-  setHint('Click and drag to draw your shape, then click ▶ Play');
+  ctx.clearRect(0,0,W,H); drawGrid();
+  setHint('Drag to draw your shape, then tap ▶ Play');
   document.getElementById('modeTag').textContent = 'DRAW';
   document.getElementById('drawBtn').classList.add('active');
   document.getElementById('playBtn').classList.remove('active');
@@ -562,14 +782,17 @@ function stopAnim() {
 function fullReset() {
   stopAnim();
   sketchPoints = []; originalPts = []; fourier = []; tracePoints = []; time = 0; dftN = 0;
+  paused = false;
+  document.getElementById('pauseBtn').textContent = '⏸ Pause';
+  document.getElementById('pauseBtn').classList.remove('active');
   mode = 'idle';
-  ctx.clearRect(0, 0, W, H); drawGrid();
+  ctx.clearRect(0,0,W,H); drawGrid();
   document.getElementById('modeTag').textContent = 'IDLE';
   document.getElementById('drawBtn').classList.remove('active');
   document.getElementById('playBtn').classList.remove('active');
   document.querySelectorAll('.shape-btn').forEach(x => x.classList.remove('active'));
   ['s-n','s-pts','s-phase'].forEach(id => document.getElementById(id).textContent = '--');
-  setHint('Pick a preset or click ✏ Draw to sketch your own shape');
+  setHint('Pick a preset or tap ✏ Draw to sketch');
 }
 
 function setHint(msg) {
@@ -579,21 +802,23 @@ function setHint(msg) {
 }
 
 // ── Mouse / Touch ──────────────────────────────────────────────────────────────
+function getPos(e) {
+  const r = canvas.getBoundingClientRect();
+  return { x: e.clientX - r.left, y: e.clientY - r.top };
+}
+
 canvas.addEventListener('mousedown', e => {
   if (mode !== 'drawing') return;
   isMouseDown = true; sketchPoints = [];
-  const r = canvas.getBoundingClientRect();
-  sketchPoints.push({ x: e.clientX - r.left, y: e.clientY - r.top });
+  sketchPoints.push(getPos(e));
 });
-
 canvas.addEventListener('mousemove', e => {
   if (!isMouseDown || mode !== 'drawing') return;
-  const r = canvas.getBoundingClientRect();
-  const p = { x: e.clientX - r.left, y: e.clientY - r.top };
-  const last = sketchPoints[sketchPoints.length - 1];
-  if (Math.hypot(p.x - last.x, p.y - last.y) > 4) {
+  const p = getPos(e);
+  const last = sketchPoints[sketchPoints.length-1];
+  if (Math.hypot(p.x-last.x, p.y-last.y) > 4) {
     sketchPoints.push(p);
-    ctx.clearRect(0, 0, W, H); drawGrid();
+    ctx.clearRect(0,0,W,H); drawGrid();
     ctx.beginPath();
     ctx.moveTo(sketchPoints[0].x, sketchPoints[0].y);
     sketchPoints.forEach(pt => ctx.lineTo(pt.x, pt.y));
@@ -602,16 +827,46 @@ canvas.addEventListener('mousemove', e => {
     ctx.stroke();
   }
 });
-
 canvas.addEventListener('mouseup', () => {
   if (!isMouseDown) return; isMouseDown = false;
   if (mode === 'drawing' && sketchPoints.length > 10)
-    setHint('Shape captured! Click ▶ Play to animate');
+    setHint('Shape captured! Tap ▶ Play to animate');
 });
 
-canvas.addEventListener('touchstart', e => { e.preventDefault(); const t=e.touches[0]; canvas.dispatchEvent(new MouseEvent('mousedown',{clientX:t.clientX,clientY:t.clientY})); },{passive:false});
-canvas.addEventListener('touchmove',  e => { e.preventDefault(); const t=e.touches[0]; canvas.dispatchEvent(new MouseEvent('mousemove',{clientX:t.clientX,clientY:t.clientY})); },{passive:false});
-canvas.addEventListener('touchend',   e => { e.preventDefault(); canvas.dispatchEvent(new MouseEvent('mouseup',{})); },{passive:false});
+canvas.addEventListener('touchstart', e => {
+  e.preventDefault();
+  const t = e.touches[0];
+  if (mode !== 'drawing') return;
+  isMouseDown = true; sketchPoints = [];
+  const r = canvas.getBoundingClientRect();
+  sketchPoints.push({ x: t.clientX-r.left, y: t.clientY-r.top });
+}, {passive:false});
+
+canvas.addEventListener('touchmove', e => {
+  e.preventDefault();
+  if (!isMouseDown || mode !== 'drawing') return;
+  const t = e.touches[0];
+  const r = canvas.getBoundingClientRect();
+  const p = { x: t.clientX-r.left, y: t.clientY-r.top };
+  const last = sketchPoints[sketchPoints.length-1];
+  if (Math.hypot(p.x-last.x, p.y-last.y) > 4) {
+    sketchPoints.push(p);
+    ctx.clearRect(0,0,W,H); drawGrid();
+    ctx.beginPath();
+    ctx.moveTo(sketchPoints[0].x, sketchPoints[0].y);
+    sketchPoints.forEach(pt => ctx.lineTo(pt.x, pt.y));
+    ctx.strokeStyle = 'rgba(255,229,102,0.85)';
+    ctx.lineWidth = 2; ctx.lineJoin = 'round'; ctx.lineCap = 'round';
+    ctx.stroke();
+  }
+}, {passive:false});
+
+canvas.addEventListener('touchend', e => {
+  e.preventDefault();
+  if (!isMouseDown) return; isMouseDown = false;
+  if (mode === 'drawing' && sketchPoints.length > 10)
+    setHint('Shape captured! Tap ▶ Play to animate');
+}, {passive:false});
 
 // ── Presets ────────────────────────────────────────────────────────────────────
 function loadPreset(name) {
@@ -620,68 +875,47 @@ function loadPreset(name) {
   const pts = [];
 
   for (let i = 0; i < N; i++) {
-    const t = (2 * Math.PI * i) / N;
+    const t = (2*Math.PI*i)/N;
     let x = 0, y = 0;
-
     switch (name) {
       case 'circle':
-        x = R * Math.cos(t);
-        y = R * Math.sin(t);
-        break;
-
+        x = R*Math.cos(t); y = R*Math.sin(t); break;
       case 'star': {
-        // 5-pointed star: trace outline by interpolating between 10 vertices
-        // (alternating outer tips and inner notches)
-        const numPoints = 5;
-        const outerR = R;
-        const innerR = R * 0.4;
-        const totalVerts = numPoints * 2; // 10 vertices
-        // which segment are we in?
-        const progress = i / N * totalVerts; // 0 → 10
-        const seg = Math.floor(progress);
-        const frac = progress - seg;
-        const a0 = (seg / totalVerts) * 2 * Math.PI - Math.PI / 2;
-        const a1 = ((seg + 1) / totalVerts) * 2 * Math.PI - Math.PI / 2;
-        const r0 = seg % 2 === 0 ? outerR : innerR;
-        const r1 = seg % 2 === 0 ? innerR : outerR;
-        x = r0 * Math.cos(a0) + frac * (r1 * Math.cos(a1) - r0 * Math.cos(a0));
-        y = r0 * Math.sin(a0) + frac * (r1 * Math.sin(a1) - r0 * Math.sin(a0));
+        const outerR = R, innerR = R*0.4, totalV = 10;
+        const progress = i/N*totalV;
+        const seg = Math.floor(progress), frac = progress-seg;
+        const a0 = (seg/totalV)*2*Math.PI - Math.PI/2;
+        const a1 = ((seg+1)/totalV)*2*Math.PI - Math.PI/2;
+        const r0 = seg%2===0 ? outerR : innerR;
+        const r1 = seg%2===0 ? innerR : outerR;
+        x = r0*Math.cos(a0) + frac*(r1*Math.cos(a1) - r0*Math.cos(a0));
+        y = r0*Math.sin(a0) + frac*(r1*Math.sin(a1) - r0*Math.sin(a0));
         break;
       }
-
       case 'heart':
-        x =  R * 0.75 * 16 * Math.pow(Math.sin(t), 3) / 16;
-        y = -R * 0.75 * (13*Math.cos(t) - 5*Math.cos(2*t) - 2*Math.cos(3*t) - Math.cos(4*t)) / 16;
+        x =  R*0.75*16*Math.pow(Math.sin(t),3)/16;
+        y = -R*0.75*(13*Math.cos(t)-5*Math.cos(2*t)-2*Math.cos(3*t)-Math.cos(4*t))/16;
         break;
-
       case 'lissajous':
-        x = R * Math.sin(3*t + Math.PI/4);
-        y = R * Math.sin(2*t);
-        break;
-
+        x = R*Math.sin(3*t+Math.PI/4); y = R*Math.sin(2*t); break;
       case 'trefoil': {
-        const r2 = R * Math.abs(Math.cos(1.5 * t));
-        x = r2 * Math.cos(t); y = r2 * Math.sin(t);
-        break;
+        const r2 = R*Math.abs(Math.cos(1.5*t));
+        x = r2*Math.cos(t); y = r2*Math.sin(t); break;
       }
-
       case 'butterfly': {
-        const e = Math.exp(Math.cos(t)) - 2*Math.cos(4*t) - Math.pow(Math.sin(t/12), 5);
-        x = R * 0.33 * Math.sin(t) * e;
-        y = -R * 0.33 * Math.cos(t) * e;
-        break;
+        const e = Math.exp(Math.cos(t))-2*Math.cos(4*t)-Math.pow(Math.sin(t/12),5);
+        x = R*0.33*Math.sin(t)*e; y = -R*0.33*Math.cos(t)*e; break;
       }
     }
     pts.push({ x, y });
   }
-
   beginPlay(pts);
 }
 
 // ── Boot ───────────────────────────────────────────────────────────────────────
 drawGrid();
 setTimeout(() => {
-  document.querySelector('[data-shape="heart"]').classList.add('active');
+  document.querySelectorAll('[data-shape="heart"]').forEach(b => b.classList.add('active'));
   loadPreset('heart');
 }, 150);
 </script>
