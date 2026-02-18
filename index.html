@@ -156,6 +156,8 @@
   canvas {
     flex: 1;
     display: block;
+    width: 100%;
+    height: 100%;
     cursor: crosshair;
     touch-action: none;
   }
@@ -896,6 +898,7 @@ canvas.addEventListener('touchend', e => {
 // ── Presets ────────────────────────────────────────────────────────────────────
 function loadPreset(name) {
   currentPreset = name;
+  if (W === 0 || H === 0) { resize(); }
   const N = 512;
   const R = Math.min(W, H) * 0.33;
   const pts = [];
@@ -939,12 +942,18 @@ function loadPreset(name) {
 }
 
 // ── Boot ───────────────────────────────────────────────────────────────────────
-drawGrid();
-setTimeout(() => {
-  resize(); // ensure canvas is sized before computing preset radius
+// Boot: use rAF to guarantee browser has laid out the page before reading dimensions
+function boot() {
+  resize();
+  if (W === 0 || H === 0) {
+    requestAnimationFrame(boot); // keep waiting if layout not ready
+    return;
+  }
+  drawGrid();
   document.querySelectorAll('[data-shape="heart"]').forEach(b => b.classList.add('active'));
   loadPreset('heart');
-}, 200);
+}
+requestAnimationFrame(boot);
 </script>
 </body>
 </html>
